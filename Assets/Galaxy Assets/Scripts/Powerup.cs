@@ -6,6 +6,9 @@ public class Powerup : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 3.0f;
+    [SerializeField]
+    private int powerupID;
+
 	// Update is called once per frame
 	void Update ()
     {
@@ -14,16 +17,32 @@ public class Powerup : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Collided whith: " + other.name);            
-    
-        Player player = other.GetComponent<Player>();
+        Debug.Log("Collided whith: " + other.name);
 
-        if (player != null)
+        if (other.tag == "Player")
         {
-            player.TripleShotPowerupOn();
+            Player player = other.GetComponent<Player>();
+
+            if (player != null)
+            {
+                if (powerupID == 0)
+                {
+                    player.TripleShotPowerupOn();
+                }
+                else if (powerupID == 1)
+                {
+                    player.SpeedBoostPowerupOn();
+                }
+                else if (powerupID == 2)
+                {
+                    player.EnabledShields();
+                }
+
+            }
+
+            Destroy(this.gameObject);
         }
-            
-        Destroy(this.gameObject);
+        
         
     }
 }

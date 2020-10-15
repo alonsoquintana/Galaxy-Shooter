@@ -6,11 +6,20 @@ public class Player : MonoBehaviour
 {
 
     public bool canTripleShot = false;
+    public bool isSpeedBoostActive = false;
+    public bool shieldsActive = false;
 
+    public int lives = 3;
+
+    [SerializeField]
+    private GameObject _explosionPrefab;
     [SerializeField]
     private GameObject _laserPrefabs;
     [SerializeField]
     private GameObject _tripleShotPrefab;
+    [SerializeField]
+    private GameObject _shieldGameObject;
+
     [SerializeField]
     private float _fireRate = 0.25f;
     
@@ -53,12 +62,20 @@ public class Player : MonoBehaviour
     }
 
     private void movemet()
-    {
+    {                
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        transform.Translate(Vector3.right * _speed * horizontalInput * Time.deltaTime);
-        transform.Translate(Vector3.up * _speed * verticalInput * Time.deltaTime);
 
+        if (isSpeedBoostActive == true)
+        {
+            transform.Translate(Vector3.right * _speed * 1.5f * horizontalInput * Time.deltaTime);
+            transform.Translate(Vector3.up * _speed * 1.5f * verticalInput * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(Vector3.right * _speed * horizontalInput * Time.deltaTime);
+            transform.Translate(Vector3.up * _speed * verticalInput * Time.deltaTime);
+        }
 
         if (transform.position.y > 0)
         {
@@ -78,16 +95,51 @@ public class Player : MonoBehaviour
             transform.position = new Vector3(9.5f, transform.position.y, 0);
         }
     }
-    
+
+    public void Damage()
+    {
+        if (shieldsActive == true)
+        {
+            shieldsActive = false;
+            _shieldGameObject.SetActive(false);
+            return;
+        }
+
+        lives--;
+        if (lives < 1)
+        {
+            Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
+        }
+    }
+
     public void TripleShotPowerupOn()
     {
         canTripleShot = true;
         StartCoroutine(TripleShotPowerDownRoutine());
     }
 
+    public void SpeedBoostPowerupOn()
+    {
+        isSpeedBoostActive = true;
+        StartCoroutine(SpeedBostPowerDownRoutine());
+    }
+
+    public void EnabledShields()
+    {
+        shieldsActive = true;
+        _shieldGameObject.SetActive(true);
+    }
+
     public IEnumerator TripleShotPowerDownRoutine()
     {
         yield return new WaitForSeconds(5.0f);
         canTripleShot = false;
+    }
+
+    public IEnumerator SpeedBostPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        isSpeedBoostActive = false;        
     }
 }
