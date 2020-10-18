@@ -27,12 +27,20 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     public float _speed = 5.0f;
-    
-   
+
+    private UIManager _uiManager;
+
     private void Start()
     {
         //current pos = new position
         transform.position = new Vector3(0, 0, 0);
+
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (_uiManager != null)
+        {
+            _uiManager.UpdateLives(lives);
+        }
     }
 
     private void Update()
@@ -106,6 +114,8 @@ public class Player : MonoBehaviour
         }
 
         lives--;
+        _uiManager.UpdateLives(lives);
+
         if (lives < 1)
         {
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
