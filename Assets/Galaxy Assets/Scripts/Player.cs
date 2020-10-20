@@ -29,6 +29,9 @@ public class Player : MonoBehaviour
     public float _speed = 5.0f;
 
     private UIManager _uiManager;
+    private GameManager _gameManager;
+    private SpawnManager _spawnManager;
+    private AudioSource _audioSource;
 
     private void Start()
     {
@@ -41,6 +44,17 @@ public class Player : MonoBehaviour
         {
             _uiManager.UpdateLives(lives);
         }
+
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+
+        if (_spawnManager != null)
+        {
+            _spawnManager.StartSpawnRoutines();
+        }
+
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -55,6 +69,7 @@ public class Player : MonoBehaviour
 
     private void shoot()
     {
+        _audioSource.Play();
         if (Time.time > _canFire)
         {
             if (canTripleShot == true)
@@ -119,6 +134,8 @@ public class Player : MonoBehaviour
         if (lives < 1)
         {
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+            _gameManager.gameOver = true;
+            _uiManager.ShowTitleScreen();
             Destroy(this.gameObject);
         }
     }
